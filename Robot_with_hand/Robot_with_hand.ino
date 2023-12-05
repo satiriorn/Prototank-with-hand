@@ -21,11 +21,19 @@ const int CW  = 1;
 Robojax_L298N_DC_motor motors(IN1, IN2, ENA, IN2, IN3, ENB, true);
 BluetoothSerial SerialBT;
 
-Servo servo1;
-Servo servo2;
+Servo base_servo;
+Servo shoulder_servo;
+Servo elbow_servo;
+Servo grip_servo;
+
 #define servo1Pin 26
-#define servo2Pin 4
-int pos = 0;     
+#define servo2Pin 25
+#define servo3Pin 2
+#define servo4Pin 4
+int base_position = 90;
+int shoulder_position = 90;
+int elbow_position = 90;
+int grip_position = 90;    
 
 struct MotorsState {
       int speed_motor1 = 0;
@@ -72,8 +80,10 @@ void setup() {
   Serial.begin(115200);
   motors.begin();
   SerialBT.begin("Robot with hand");
-  servo1.attach(servo1Pin);
-  servo2.attach(servo2Pin);
+  base_servo.attach(servo1Pin);
+  elbow_servo.attach(servo2Pin);
+  shoulder_servo.attach(servo3Pin);
+  grip_servo.attach(servo4Pin);
 }
 
 void loop() {
@@ -106,12 +116,36 @@ void loop() {
         Serial.println(motors_state.speed_motor1);
       }
     else if(incomingChar=='l'){
-        pos =(pos<180) ? pos+5:pos;
-        servo1.write(pos);
+        base_position =(base_position<250) ? base_position+5:base_position;
+        base_servo.write(base_position);
       }
     else if(incomingChar=='r'){
-        pos =(pos>0) ? pos-5:pos;
-        servo1.write(pos);
+        base_position =(base_position>0) ? base_position-5:base_position;
+        base_servo.write(base_position);
+      }
+    else if(incomingChar=='p'){
+        shoulder_position =(shoulder_position<180) ? shoulder_position+5:shoulder_position;
+        shoulder_servo.write(shoulder_position);
+      }
+    else if(incomingChar=='b'){
+        shoulder_position =(shoulder_position>0) ? shoulder_position-5:shoulder_position;
+        shoulder_servo.write(shoulder_position);
+      }
+    else if(incomingChar=='u'){
+        elbow_position =(elbow_position<180) ? elbow_position+5:elbow_position;
+        elbow_servo.write(elbow_position);
+      }
+    else if(incomingChar=='d'){
+        elbow_position =(elbow_position>0) ? elbow_position-5:elbow_position;
+        elbow_servo.write(elbow_position);
+      }
+    else if(incomingChar=='n'){
+        grip_position = 180;
+        grip_servo.write(grip_position);
+      }
+    else if(incomingChar=='f'){
+        grip_position =0;
+        grip_servo.write(grip_position);
       }
     Serial.write(incomingChar);  
   }
